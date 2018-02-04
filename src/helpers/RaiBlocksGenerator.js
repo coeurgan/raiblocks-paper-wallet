@@ -186,6 +186,10 @@ class RaiBlocksGenerator {
     }
 
     generateSeed(entropy = null) {
+	    if (entropy != null)
+	    {
+		    return uint8_hex(blake.blake2bHex(entropy,null, 16));
+	    }
         return uint8_hex(nacl.randomBytes(32));
     }
 

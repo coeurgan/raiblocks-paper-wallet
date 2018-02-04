@@ -21,13 +21,14 @@ class Generator extends Component {
             public_key: null,
             private_key: null,
             seed: null,
+	    passphrase: null,
         };
     }
 
     renderPaperWallet() {
         return (
             <div className="center-align">
-                <PaperWallet publicKey={this.state.public_key} privateKey={this.state.private_key} seed={this.state.seed} />
+                <PaperWallet publicKey={this.state.public_key} privateKey={this.state.private_key} seed={this.state.seed} passphrase={this.state.passphrase}/>
                 <br/>
                 <div>
                     <Button waves='light' className="cyan" onClick={() => window.print()}>
@@ -43,13 +44,14 @@ class Generator extends Component {
     onSubmit(values) {
         let raiBlocksGenerator = new RaiBlocksGenerator();
         if(!raiBlocksGenerator._isValidSeed(values.seed)) {
-            alert("This is not a valid SEED!");
+            alert("This is not a valid SEED ("+values.seed+")!");
             return null;
         }
         this.setState({
             public_key: values.public_key,
             private_key: values.private_key,
             seed: values.seed,
+	    passphrase: values.passphrase,
         });
     }
 
@@ -65,7 +67,12 @@ class Generator extends Component {
 
     generateWallet(event) {
         let raiBlocksGenerator = new RaiBlocksGenerator();
-        const seed = raiBlocksGenerator.generateSeed();
+	var seed;
+	if(this.state.passphrase!= null){
+          seed = raiBlocksGenerator.generateSeed(this.state.passphrase);
+	} else {
+          seed = raiBlocksGenerator.generateSeed();
+	}
         const private_key = raiBlocksGenerator.generateIndentifier(seed) ;
         const public_key = raiBlocksGenerator.generateAccountAddress(seed);
 
@@ -75,11 +82,27 @@ class Generator extends Component {
 
         event.preventDefault();
     }
+    updatePassphrase(event){
+        this.setState({
+	    passphrase: event.target.value
+        });
+    }
 
     renderInputForm() {
         return (
             <div>
                 <form onSubmit={this.props.handleSubmit(this.onSubmit.bind(this))}>
+                    <Field
+                        name="passphrase"
+                        type="text"
+                        icon="call_received"
+                        s={12}
+                        label="Passphrase (Optional)"
+                        placeholder={"Omelette du fromage"}
+                        validade={true}
+                        component={this.renderInput}
+		        onChange={event => this.updatePassphrase(event)}
+                    />
                     <Field
                         name="public_key"
                         type="text"
