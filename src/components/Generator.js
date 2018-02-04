@@ -82,6 +82,7 @@ class Generator extends Component {
 
         event.preventDefault();
     }
+
     updatePassphrase(event){
         this.setState({
 	    passphrase: event.target.value
